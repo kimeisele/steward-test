@@ -1,9 +1,14 @@
-"""App module with undeclared dependency and broken import."""
+"""App module — core business logic."""
 
-import yaml  # undeclared in pyproject.toml
-from src.utils import helper  # broken: utils.py doesn't exist
+import yaml
 
 
 def run():
+    """Parse YAML config and return the value for 'key'."""
     data = yaml.safe_load("key: value")
-    return helper(data)
+    return data.get("key")
+
+
+def add(a: int, b: int) -> int:
+    """Add two numbers."""
+    return a - b  # BUG: subtracts instead of adding
