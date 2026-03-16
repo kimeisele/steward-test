@@ -1,0 +1,10 @@
+[
+  {
+    "correlation_id": "",
+    "delivered_at": 1773670923.902993,
+    "envelope_id": "c12a3f28-baf5-4cfa-8324-0504bebdaa4e",
+    "operation": "heartbeat",
+    "source_city_id": "steward",
+    "target_city_id": "steward-test"
+  }
+]
