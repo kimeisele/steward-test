@@ -1,7 +1,12 @@
 {
   "kind": "agent_federation_descriptor",
-  "version": "0.1.0",
-  "repo_id": "steward-test",
+  "version": 1,
+  "repo_id": "kimeisele/steward-test",
+  "display_name": "Steward Test Sandbox",
   "status": "active",
-  "capabilities": []
+  "owner_boundary": "test_surface",
+  "capabilities": [
+    "test-target",
+    "healing-sandbox"
+  ]
 }
