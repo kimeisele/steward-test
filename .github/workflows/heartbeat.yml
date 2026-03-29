@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p data/federation
           mkdir -p data/federation
-          echo '[{"agent_id":"steward-test","op":"heartbeat","status":"alive","role":"operator"}]' > data/federation/nadi_outbox.json
+          echo '[{"agent_id":"steward-test","operation":"heartbeat","source":"steward-test","status":"alive","role":"operator"}]' > data/federation/nadi_outbox.json
 
       - name: Commit federation state
         if: always()
