@@ -128,5 +128,37 @@
     "nadi_priority": "rajas",
     "ttl_ms": 900000,
     "maha_header_hex": "238e10b6e43f4887bf5456c695a92ee5920243990e1d45a93d6af09f914cf4623254e39acee73322d0038f39d6b97d84a0bb0d0000000000ab47c7a58f365214da19537079afcb1b"
+  },
+  {
+    "source": "steward",
+    "target": "steward-test",
+    "operation": "diagnostic_report",
+    "payload": {
+      "diagnostic": {
+        "agent_id": "steward",
+        "checks": [
+          "repo_accessible",
+          "ci_"
+        ],
+        "last_ci": {
+          "conclusion": "",
+          "name": "Steward Heartbeat"
+        },
+        "last_push": "2026-03-28T17:09:44Z"
+      },
+      "steward_action": "suspect_investigation",
+      "target_peer": "steward",
+      "trust": 0.09999999999999998
+    },
+    "priority": 1,
+    "correlation_id": "8730033f-031a-474b-a89a-a04c89ba279b",
+    "timestamp": 1774772496.155231,
+    "ttl_s": 900.0,
+    "envelope_id": "8730033f-031a-474b-a89a-a04c89ba279b",
+    "nadi_type": "vyana",
+    "nadi_op": "send",
+    "nadi_priority": "rajas",
+    "ttl_ms": 900000,
+    "maha_header_hex": "238e10b6e43f4887bf5456c695a92ee5920243990e1d45a93d6af09f914cf4623254e39acee73322d0038f39d6b97d84a0bb0d0000000000ab47c7a58f365214da19537079afcb1b"
   }
 ]
