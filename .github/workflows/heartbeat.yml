@@ -76,7 +76,12 @@ jobs:
           git config user.email "bot@federation"
           git add nadi/steward-test_to_steward.json
           git diff --cached --quiet || git commit -m "relay: steward-test outbox → steward (heartbeat #${{ github.run_number }})"
-          git push || echo "Push failed, continuing..."
+          for attempt in 1 2 3; do
+            git push && break
+            echo "Push attempt $attempt failed, rebasing..."
+            git pull --rebase origin main || true
+            sleep $((RANDOM % 10 + 2))
+          done
 
           echo "[]" > "$OUTBOX"
           echo "Outbox relayed and cleared"
