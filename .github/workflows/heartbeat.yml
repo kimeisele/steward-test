@@ -34,8 +34,9 @@ jobs:
 
       - name: Run heartbeat
         run: |
+          pip install -q 'git+https://github.com/kimeisele/steward-federation.git' 2>/dev/null || true
           mkdir -p data/federation
-          echo '[{"agent_id":"steward-test","operation":"heartbeat","source":"steward-test","status":"alive","role":"operator"}]' > data/federation/nadi_outbox.json
+          nadi --peer-json data/federation/peer.json heartbeat --health 1.0
 
       - name: Commit federation state
         if: always()
