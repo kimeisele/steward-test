@@ -23,6 +23,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Restore node keys cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/federation/.node_keys.json
+          key: node-keys-${{ github.repository }}-v1
+          restore-keys: |
+            node-keys-${{ github.repository }}-
+
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -47,6 +56,13 @@ jobs:
           git diff --cached --quiet || \
             git commit -m "chore: heartbeat federation state"
           git push || true
+
+      - name: Save node keys cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/federation/.node_keys.json
+          key: node-keys-${{ github.repository }}-v1
 
       - name: Relay outbox to steward-federation hub
         if: always()
