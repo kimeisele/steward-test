@@ -99,16 +99,15 @@ def run():
         # Restore peer.json, auto-merge any open steward PRs
         PEER_PATH.write_text(json.dumps(VALID_PEER, indent=2) + "\n")
         print("CHAOS: RECOVERY — restored peer.json, resuming normal operation")
-        # Auto-merge any open steward PRs
-        result = subprocess.run(
-            ["gh", "pr", "list", "--repo", "kimeisele/steward-test",
-             "--json", "number,title", "--jq", ".[] | select(.title | contains("steward")) | .number"],
-            capture_output=True, text=True
+        # Auto-merge any open steward PRs using shell
+        subprocess.run(
+            ["bash", "-c", 
+             'gh pr list --repo kimeisele/steward-test --json number,title --jq '
+             '".[] | select(.title | contains(\\"steward\\")) | .number" | '
+             'while read pr_num; do gh pr merge "$pr_num" --repo kimeisele/steward-test --squash --auto; done'],
+            capture_output=True
         )
-        for pr_num in result.stdout.strip().splitlines():
-            subprocess.run(["gh", "pr", "merge", pr_num.strip(),
-                           "--repo", "kimeisele/steward-test", "--squash", "--auto"])
-            print(f"CHAOS: auto-merged PR #{pr_num.strip()}")
+        print("CHAOS: auto-merged steward PRs if any")
         sys.exit(0)
 
     state = advance_state(state)
