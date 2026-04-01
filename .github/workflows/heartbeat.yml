@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: heartbeat
@@ -45,7 +46,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade "git+https://${GH_TOKEN}@github.com/kimeisele/steward-federation.git#egg=nadi-kit"
 
+      - name: Run chaos controller
+        id: chaos
+        env:
+          GH_TOKEN: ${{ secrets.FEDERATION_PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FEDERATION_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          python src/chaos_controller.py
+          echo "phase_exit=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
       - name: Run NADI heartbeat cycle
+        if: steps.chaos.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.FEDERATION_PAT || secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.FEDERATION_PAT || secrets.GITHUB_TOKEN }}
@@ -60,7 +72,7 @@ jobs:
           git config user.name "steward-test-bot"
           git config user.email "bot@steward-test"
           git add data/federation/ || true
-          git diff --cached --quiet ||             git commit -m "chore: heartbeat state"
+          git diff --cached --quiet ||             git commit -m "chore: heartbeat state [phase=${{ steps.chaos.outputs.phase_exit }}]"
           git push || true
 
       - name: Save node keys cache
@@ -71,7 +83,7 @@ jobs:
           key: node-keys-${{ github.repository }}-v1
 
       - name: Relay outbox to steward-federation hub
-        if: always()
+        if: steps.chaos.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.FEDERATION_PAT || secrets.GITHUB_TOKEN }}
         run: |
@@ -87,7 +99,7 @@ jobs:
           git config user.name "steward-test-bot"
           git config user.email "bot@steward-test"
           git add nadi/steward-test_to_steward.json
-          git diff --cached --quiet || git commit -m "relay: steward-test outbox → steward (#${{ github.run_number }})"
+          git diff --cached --quiet || git commit -m "relay: steward-test outbox -> steward (#${{ github.run_number }})"
           max_retries=10
           count=0
           until git push origin main; do
