@@ -1,17 +1,4 @@
 {
-  "identity": {
-    "city_id": "steward-test",
-    "slug": "steward-test",
-    "repo": "kimeisele/steward-test",
-    "node_id": "ag_test_01"
-  },
-  "capabilities": [
-    "testing",
-    "federation_relay",
-    "chaos_emitter"
-  ],
-  "nadi": {
-    "outbox": "data/federation/nadi_outbox.json",
-    "inbox": "data/federation/nadi_inbox.json"
-  }
+  "identity": {},
+  "capabilities": []
 }
