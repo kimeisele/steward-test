@@ -76,24 +76,26 @@ def run():
     phase = state["phase"]
     print(f"CHAOS: run={state['run_count']} phase={phase} phase_run={state['phase_run']}")
 
+    exit_code = 0
+
     if phase == "ALIVE":
         # Normal heartbeat — nadi handles it
         PEER_PATH.write_text(json.dumps(VALID_PEER, indent=2) + "\n")
         print("CHAOS: ALIVE — sending normal heartbeat")
-        sys.exit(0)  # workflow continues to nadi heartbeat step
+        exit_code = 0
 
     elif phase == "SILENT":
         # No heartbeat — write empty outbox, skip nadi
         PEER_PATH.write_text(json.dumps(VALID_PEER, indent=2) + "\n")
         Path("data/federation/nadi_outbox.json").write_text("[]\n")
         print("CHAOS: SILENT — suppressing heartbeat, steward should detect SUSPECT")
-        sys.exit(1)  # non-zero exit skips subsequent steps (if: success())
+        exit_code = 1  # non-zero exit skips subsequent steps (if: success())
 
     elif phase == "CORRUPT":
         # Corrupt peer.json — steward RepoHealer should detect and PR
         PEER_PATH.write_text(json.dumps(CORRUPT_PEER, indent=2) + "\n")
         print("CHAOS: CORRUPT — invalidated peer.json, steward RepoHealer should fire")
-        sys.exit(1)  # suppress heartbeat relay
+        exit_code = 1  # suppress heartbeat relay
 
     elif phase == "RECOVERY":
         # Restore peer.json, auto-merge any open steward PRs
@@ -101,17 +103,20 @@ def run():
         print("CHAOS: RECOVERY — restored peer.json, resuming normal operation")
         # Auto-merge any open steward PRs using shell
         subprocess.run(
-            ["bash", "-c", 
+            ["bash", "-c",
              'gh pr list --repo kimeisele/steward-test --json number,title --jq '
              '".[] | select(.title | contains(\\"steward\\")) | .number" | '
              'while read pr_num; do gh pr merge "$pr_num" --repo kimeisele/steward-test --squash --auto; done'],
             capture_output=True
         )
         print("CHAOS: auto-merged steward PRs if any")
-        sys.exit(0)
+        exit_code = 0
 
+    # ALWAYS advance state and save before exiting
     state = advance_state(state)
     save_state(state)
+    print(f"CHAOS: state saved → run={state['run_count']} phase={state['phase']} phase_run={state['phase_run']}")
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
